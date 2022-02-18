@@ -12,6 +12,7 @@ local sleep = function(amount)
         oldSleep(amount)
     end
 end
+local startTime = os.epoch("utc")
 for v in file.readAll():gmatch("(.-)\n") do
     count = count + 1
     table.insert(lines,v)
@@ -44,7 +45,12 @@ for k,v in pairs(build) do
     print("writing data into file: "..v:reverse().." > " ..data)
     sleep(0.1)
 end
-print("\nfinished")
+local endTime = os.epoch("utc")
+local ms = endTime-startTime
+local s = ms/1000
+local m = s/60
+local h = m/60
+print("\nfinished. Took: "..("%dh %dm %ds %ms"):format(h%25,m%60,s%60,s%1000))
 fout.close() 
 file.close()
 
