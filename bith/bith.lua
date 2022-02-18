@@ -8,7 +8,7 @@ local bitlens = {}
 local count = 0
 local oldSleep = sleep 
 local sleep = function(amount)
-    if args[3] ~= "no-debug" then
+    if args[3] ~= "-no-debug" then
         oldSleep(amount)
     end
 end
