@@ -7,7 +7,7 @@ converts a bitmap like this
           001        4
 ```
           
-useful for fucking up your file or makign bit based factorio LCD screens
+useful for fucking up your file or making bit based factorio LCD screens
 
 usage: program <inputfile> <outputfile> <arguments>
   
