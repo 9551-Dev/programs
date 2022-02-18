@@ -9,7 +9,7 @@ converts a bitmap like this
           
 useful for fucking up your file or making bit based factorio LCD screens
 
-usage: program <inputfile> <outputfile> <arguments>
+usage: program `<inputfile> <outputfile> <arguments>`
   
   valid arguments:
     -no-debug
