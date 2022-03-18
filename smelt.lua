@@ -22,7 +22,7 @@ local slots = { --slots of the furnaces to interact with
 local log
 local function main(term)
     if not fs.exists("log_9") then
-        shell.run("wget https://github.com/9551-Dev/apis/raw/main/log.lua log_9")
+        local h=assert(http.get("https://github.com/9551-Dev/apis/raw/main/log.lua"))local f=assert(fs.open("log.lua","w"))f.write(h.readAll())f.close()h.close()
     end
     log = require("log_9").create_log(term.current())
     assert(chests.input ~= "?","please select input chest in the config",0)
