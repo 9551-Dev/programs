@@ -15,13 +15,13 @@ local cycle_delay = 0 --delay betweeen fueling and filling cycles
 
 local log
 local function main(term)
-    assert(chests.input ~= "?","please select input chest in the config",0)
-    assert(chests.output ~= "?","please select output chest in the config",0)
-    assert(chests.fuel ~= "?","please select fuel chest in the config",0)
     if not fs.exists("log_9") then
         shell.run("wget https://github.com/9551-Dev/apis/raw/main/log.lua log_9")
     end
     log = require("log_9").create_log(term.current())
+    assert(chests.input ~= "?","please select input chest in the config",0)
+    assert(chests.output ~= "?","please select output chest in the config",0)
+    assert(chests.fuel ~= "?","please select fuel chest in the config",0)
     local furnaces = {peripheral.find("minecraft:furnace")}
     for k,v in pairs(furnaces) do
         log(peripheral.getName(v),log.update)
