@@ -10,6 +10,12 @@ local chests = {
 }
 
 local cycle_delay = 0 --delay betweeen fueling and filling cycles
+
+local slots = { --slots of the furnaces to interact with
+    input=1,
+    output=3,
+    fuel=2
+}
 ------------------------------------------------------------------
 ------------------------------------------------------------------
 
@@ -48,7 +54,7 @@ local function main(term)
     local function process_input_part(type,furnace,size,f_am)
         local tcnt = 0
         for i=1,size do
-            tcnt = tcnt + furnace.pullItems(chests[type],i,math.ceil((f_am-tcnt)+0.5),(type == "fuel") and 2 or 1)
+            tcnt = tcnt + furnace.pullItems(chests[type],i,math.ceil((f_am-tcnt)+0.5),(type == "fuel") and slots.fuel or slots.input)
             if tcnt >= f_am then return end
         end
     end
@@ -72,7 +78,7 @@ local function main(term)
         for k,v in ipairs(furnaces) do
             table.insert(t1,function() process_input_part("fuel",v,f_cs,f_am) end)
             table.insert(t2,function() process_input_part("input",v,i_cs,i_am) end)
-            table.insert(t3,function() v.pushItems(chests.output,3) end)
+            table.insert(t3,function() v.pushItems(chests.output,slots.output) end)
         end
         parallel.waitForAll(post_process(t1,t2,t3))
         log("Finished cycles ",log.success)
