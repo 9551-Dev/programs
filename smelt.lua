@@ -83,7 +83,8 @@ local function main_wrapped()
     main(main_term_log_object)
 end
 local function error_handle(err)
-    log("an fatal error occured: "..err,log.fatal)
+
+    log("an fatal error occured: "..err:match(":%d+: (.+)"),log.fatal)
     log("type Y to save log into smelt.log",log.update)
     log.term.scroll(1)
     local _,h = log.term.getSize()
@@ -92,4 +93,4 @@ local function error_handle(err)
     if user_select:match("Y") then log:dump("smelt") end
 end
 
-local ok,err = xpcall(main_wrapped,error_handle)
+xpcall(main_wrapped,error_handle)
