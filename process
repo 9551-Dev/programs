@@ -1,5 +1,5 @@
-------------------------------------------------------------------
--------------CONFIG-----------------------------------------------
+--------program for automatic processing----------------------------------------------------
+-------------CONFIG-------------------------------------------------------------------------
 local main_term_log_object = term
 
 local chests = {
@@ -9,6 +9,8 @@ local chests = {
     wraps={}
 }
 
+local processing_unit_type = "minecraft:furnace" --type of unit to process with
+
 local cycle_delay = 0 --delay betweeen fueling and filling cycles
 
 local slots = { --slots of the furnaces to interact with
@@ -16,8 +18,8 @@ local slots = { --slots of the furnaces to interact with
     output=3,
     fuel=2
 }
-------------------------------------------------------------------
-------------------------------------------------------------------
+--------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------
 
 local log
 local function main(term)
@@ -28,11 +30,11 @@ local function main(term)
     assert(chests.input ~= "?","please select input chest in the config",0)
     assert(chests.output ~= "?","please select output chest in the config",0)
     assert(chests.fuel ~= "?","please select fuel chest in the config",0)
-    local furnaces = {peripheral.find("minecraft:furnace")}
+    local furnaces = {peripheral.find(processing_unit_type)}
     for k,v in pairs(furnaces) do
         log(peripheral.getName(v),log.update)
     end
-    log("found "..#furnaces.." furnaces",log.success)
+    log("found "..#furnaces.." units",log.success)
     log("")
     for k,v in pairs(chests) do
         if type(v) == "string" then
