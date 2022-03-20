@@ -24,13 +24,9 @@ local main = function()
     rec.setAlpha(122)
     rec.setColor(0,0,0)
     local function getClosest(tbl)
-        local pyth = function(x,y,z)
-            return math.sqrt(x^2+y^2+z^2)  
-        end
+        local pyth = function(x,y,z) return math.sqrt(x^2+y^2+z^2)   end
         local result = {}
-        for k,v in pairs(tbl) do
-            result[k] = pyth(v.x,v.y,v.z)
-        end
+        for k,v in pairs(tbl) do result[k] = pyth(v.x,v.y,v.z) end
         local minv = math.min(table.unpack(result))
         local resultFinal
 		local resIndex
@@ -47,8 +43,7 @@ local main = function()
         local r,g,b = term.getPaletteColor(ins)
         return r*255,g*255,b*255
     end
-    local blc
-    local offset
+    local blc,offset
 	local stabilize = function()
 		local x, y, z = gps.locate(0.2)
 		if x then
@@ -57,26 +52,18 @@ local main = function()
                 -((y%1)-0.5),
 				-((z%1)-0.5)
 			}
-		else
-			offset = nil
-		end
+		else offset = nil end
 	end
-	local scanBlocks = function()
-		blc = per.scan()
-	end
+	local scanBlocks = function() blc = per.scan() end
     while true do
         parallel.waitForAll(stabilize,scanBlocks)
 		c3d.clear()
         local matches = {}
         for k,v in pairs(blc) do
 			if type(findDamage) == "number" then
-            	if v.name == block and v.metadata == findDamage then
-                	table.insert(matches,v)
-            	end
+                if v.name == block and v.metadata == findDamage then table.insert(matches,v) end
 			else
-				if v.name == block then
-                	table.insert(matches,v)
-            	end
+				if v.name == block then table.insert(matches,v) end
 			end
         end
 		if not next(matches) then matches = 'no block "'..block..'" was found' end
@@ -102,9 +89,7 @@ local main = function()
                     highlight.setAlpha(64)
 				end
 				item.setDepthTested(false)
-			else
-				str = matches
-			end
+			else str = matches end
             rec.setSize(#str*5+2,20)
             text.setText(str)
 		end
