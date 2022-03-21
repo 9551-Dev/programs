@@ -32,7 +32,7 @@ for k,v in pairs(mons) do
     v.clear()
     v.setTextScale(0.5)
     v.setCursorPos(1,1)
-    v.setBackgroundColor(colors.red)
+    v.setBackgroundColor(colors.orange)
     local _log = api.create_log(v,"item logger","\127")
     _log.history = history
     table.insert(logs,_log)
@@ -40,7 +40,8 @@ for k,v in pairs(mons) do
 end
 for k,v in pairs(history) do
     for k,_log in pairs(logs) do
-        _log(v.str,v.type)
+        _log(":"..v.str,v.type)
+        table.remove(_log.history,#log.history)
     end
 end
 local lt = debug.getmetatable(api.create_log(term)).__index
