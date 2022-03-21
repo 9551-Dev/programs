@@ -58,9 +58,15 @@ for k,v in pairs(mons) do
     v.setBackgroundColor(colors.black)
     v.setCursorPos(1,3)
 end
+local function remove_time(str)
+    return str:gsub("^%[%d-%:%d-% %a-]","")
+end
+local function remove_n(str)
+    return str:gsub("%(%d-%)$","")
+end
 for k,v in pairs(history) do
     for k,_log in pairs(logs) do
-        _log(":"..v.str,v.type)
+        _log(":"..remove_time(remove_n(v.str)),v.type)
         table.remove(_log.history,#_log.history)
     end
 end
