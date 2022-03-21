@@ -111,7 +111,7 @@ for i=1,math.huge do
                 local file = fs.open("ae_name.cache","w")
                 file.write(textutils.serialise(cache))
                 file.close()
-                log("found unnamed item "..k.." adding into name cache....",lt.warn)
+                log("found unnamed item "..k.." adding into name cache as "..name.."....",lt.warn)
             end
         end
         if list[k] then
@@ -131,7 +131,7 @@ for i=1,math.huge do
                 local file = fs.open("ae_name.cache","w")
                 file.write(textutils.serialise(cache))
                 file.close()
-                log("found unnamed item "..k.." adding into name cache....",lt.warn)
+                log("found unnamed item "..k.." adding into name cache as "..name.."....",lt.warn)
             end
         end
         if not old_list[k] then log("Added "..name.." into system",lt.success) end
