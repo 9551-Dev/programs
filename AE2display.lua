@@ -37,6 +37,7 @@ for k,v in pairs(mons) do
     _log.history = history
     table.insert(logs,_log)
     v.setBackgroundColor(colors.black)
+    v.setCursorPos(1,3)
 end
 for k,v in pairs(history) do
     for k,_log in pairs(logs) do
