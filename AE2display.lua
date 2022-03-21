@@ -38,6 +38,11 @@ for k,v in pairs(mons) do
     table.insert(logs,_log)
     v.setBackgroundColor(colors.black)
 end
+for k,v in pairs(history) do
+    for k,_log in pairs(logs) do
+        _log(v.str,v.type)
+    end
+end
 local lt = debug.getmetatable(api.create_log(term)).__index
 local function log(str,type)
     for k,v in pairs(logs) do
