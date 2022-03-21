@@ -8,17 +8,24 @@ local cfg = {
 if not fs.exists("log.lua") then
     shell.run("wget https://github.com/9551-Dev/apis/raw/main/log.lua")
 end
- 
+
+local history = {}
+if fs.exists("ae.history") then
+    local file = fs.open("ae.history","r")
+    local data = file.readAll()
+    file.close()
+    history = textutils.unserialise(data)
+end
+
 local wrap = peripheral.find("appliedenergistics2:interface")
 if not wrap then error("failed ot find AE2 interface",0) end 
 local function convert_to_name(list)
     local out = {}
     for k,v in pairs(list) do
-        out[v.name] = v
+        out[v.name..tostring(v.damage or 0)] = v
     end
     return out
 end
- 
 local old_list = convert_to_name(wrap.listAvailableItems())
 local api = require("log")
 local mons = {peripheral.find("monitor")}
@@ -29,23 +36,24 @@ for k,v in pairs(mons) do
     v.setTextScale(0.5)
     v.setCursorPos(1,1)
     v.setBackgroundColor(colors.red)
+    local _log = api.create_log(v,"item logger","\127")
+    _log.history = history
     table.insert(logs,api.create_log(v,"item logger","\127"))
     v.setBackgroundColor(colors.black)
 end
- 
 local lt = debug.getmetatable(api.create_log(term)).__index
- 
 local function log(str,type)
     for k,v in pairs(logs) do
         v(str,type)
     end
 end
- 
 local function dump(i)
     local lg = logs[math.random(1,#logs)]
-    lg:dump("AE_latest")
+    lg:dump("ae")
+    local file = fs.open("ae.history","w")
+    file.write(textutils.serialise(lg.history))
+    file.close
 end
- 
 for i=1,math.huge do
     local list = wrap.listAvailableItems()
     local list = convert_to_name(list)
