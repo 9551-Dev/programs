@@ -66,7 +66,7 @@ local function remove_n(str)
 end
 for k,v in pairs(history) do
     for k,_log in pairs(logs) do
-        _log(":"..remove_time(remove_n(v.str)),v.type)
+        _log(remove_time(remove_n(v.str)):gsub("^% ",""),v.type)
         table.remove(_log.history,#_log.history)
     end
 end
