@@ -428,7 +428,7 @@ else
                             end
                         end
                     end
-                    if dfs[3] > 11 then
+                    if dfs[3] > 2 then
                         if windowOpen == "" or dfs[3] < xs/2-19 then
                             term.setTextColor(colors.red)
                             if b.boxButton(1,dclick,dfs[1]+dfs[3]+3,dfs[2]+2,"red","black","-",2,1) then
@@ -449,7 +449,7 @@ else
                             end
                         end
                     end
-                    if dfs[4] > 4 then
+                    if dfs[4] > 2 then
                         if b.boxButton(1,dclick,dfs[1]+(dfs[3]/2)+3,dfs[4]*2+5,"red","black","-",2,1) then
                             dfs[4] = dfs[4] - 0.5
                             dfs[2] = dfs[2] - 0.5
