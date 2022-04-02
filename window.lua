@@ -1,6 +1,7 @@
 if not fs.exists("GuiH") then
     shell.run("wget run https://github.com/9551-Dev/Gui-h/raw/main/installer.lua")
 end
+local g_win = window.create(term.current(),1,1,term.getSize())
 local program,w,h = ...
 local args = {...}
 table.remove(args,1)
@@ -9,7 +10,7 @@ table.remove(args,1)
 _G.args = args
 w,h = (w ~= "") and w or "20",(h ~= "") and h or "10"
 local api = require("GuiH.main")
-local gui = api.create_gui(term.current())
+local gui = api.create_gui(g_win)
 local frame = gui.create.frame({
     x=2,2,width=tonumber(w),height=tonumber(h),
     dragger={
@@ -52,7 +53,10 @@ term.redirect(t_win)
 local function update_thread()
     gui.update(0)
     while true do
+        g_win.setVisible(false)
+        g_win.clear()
         gui.update()
+        g_win.setVisible(true)
     end
 end
 local shell_coro = coroutine.create(function()
@@ -62,20 +66,22 @@ end)
 local function update_shell()
     coroutine.resume(shell_coro)
     while coroutine.status(shell_coro) ~= "dead" do
+        g_win.setVisible(false)
+        g_win.clear()
         local ev_data = table.pack(os.pullEvent())
         local ev = api.convert_event(table.unpack(ev_data,1,ev_data.n))
         if api.valid_events[ev.name] then
             local x,y = win.getPosition()
             ev_data[3] = ev.x-x
             ev_data[4] = ev.y-y
-            coroutine.resume(shell_coro,table.unpack(ev_data,1,ev_data.n))
-        else
-            coroutine.resume(shell_coro,table.unpack(ev_data,1,ev_data.n))
         end
+        coroutine.resume(shell_coro,table.unpack(ev_data,1,ev_data.n))
+        win.redraw()
+        g_win.setVisible(true)
     end
 end
 pcall(function()
-    parallel.waitForAll(
+    parallel.waitForAny(
         update_thread,
         update_shell
     )
