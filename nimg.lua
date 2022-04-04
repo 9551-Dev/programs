@@ -449,7 +449,7 @@ else
                             end
                         end
                     end
-                    if dfs[4] > 2 then
+                    if dfs[4] > 1 then
                         if b.boxButton(1,dclick,dfs[1]+(dfs[3]/2)+3,dfs[4]*2+5,"red","black","-",2,1) then
                             dfs[4] = dfs[4] - 0.5
                             dfs[2] = dfs[2] - 0.5
