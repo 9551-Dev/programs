@@ -32,6 +32,7 @@ local frame = gui.create.frame({
                 )-object.positioning.height,1
             )
         )
+        object.window.restoreCursor()
         return true
     end,
     btn={true}
@@ -81,9 +82,9 @@ local function update_shell()
         g_win.setVisible(true)
     end
 end
-local ok,err = pcall(gui.execute,update_shell)
+local err = gui.execute(update_shell)
 term.redirect(old_term)
 term.clear()
 term.setCursorPos(1,1)
-print("Ended window session. "..((ok == false) and err or ""))
+print("Ended window session. "..((err ~= nil) and err or ""))
 term.setCursorPos(1,2)
