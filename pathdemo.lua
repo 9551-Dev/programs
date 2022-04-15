@@ -102,7 +102,7 @@ end,function(term,event)
         local node = path.findInGrid(grid.grid,vector.new(event.x,event.y,1))
         local ax,ay = frame.window.getPosition()
         local bx,by = frame.window.getPosition()
-        if node and event.x ~= ax and event.y ~= ay and event.x ~= bx and event.y ~= by and not frame.dragged and not frame2.dragged then
+        if node and not (event.x == ax and event.y == ay) and not (event.x == bx and event.y == by) and not frame.dragged and not frame2.dragged then
             if event.button == 1 then
                 node.isPassable = false
                 if not passages[event.x] then passages[event.x] = {} end
@@ -116,11 +116,13 @@ end,function(term,event)
         end
     end
 end,function(term)
+    term.setBackgroundColor(colors.gray)
     for k,v in pairs(res_path) do
         term.setCursorPos(v.x,v.y)
-        term.write("x")
+        term.write(" ")
     end
-    term.setBackgroundColor(colors.black)
+    term.setBackgroundColor(colors.lightGray)
+    term.setTextColor(colors.gray)
     for x,y_list in pairs(passages) do
         for y,data in pairs(y_list) do
             term.setCursorPos(x,y)
