@@ -52,7 +52,10 @@ gui.create.button({
         text="clear walls",
         blit={"00000000000","eeeeeeeeeee"},
     },
-    on_click=function() passages = {} end
+    on_click=function()
+        grid = path.createField(w,h,1,1,1,1,w,h,1)
+        passages = {}
+    end
 })
 gui.create.button({
     name="find_path_button",
