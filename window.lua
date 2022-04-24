@@ -61,8 +61,6 @@ end)
 local function update_shell()
     sleep(0.05)
     while coroutine.status(shell_coro) ~= "dead" do
-        g_win.setVisible(false)
-        g_win.clear()
         local ev_data = table.pack(os.pullEvent())
         local ev = api.convert_event(table.unpack(ev_data,1,ev_data.n))
         if api.valid_events[ev.name] then
@@ -75,11 +73,10 @@ local function update_shell()
         end
         local cx,cy = win.getCursorPos()
         local prg = shell.getRunningProgram():match("[^%/-]+$")
+        local px,py = win.getCursorPos()
         win.setCursorPos(1,1)
         win.blit(" "..prg..(" "):rep(w-#prg-1),("0"):rep(w),("7"):rep(w))
-        win.setCursorPos(cx,cy)
-        win.redraw()
-        g_win.setVisible(true)
+        win.setCursorPos(px,py)
     end
 end
 local err = gui.execute(update_shell)
