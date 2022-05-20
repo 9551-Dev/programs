@@ -56,7 +56,7 @@ term.clear()
 
 local mGui = GuiH.create_gui(term.current())
 local gui = mGui.create.frame({
-    x=w/2-51/2+1,y=h/2-19/2+1,width=51,height=19,
+    x=math.ceil(w/2-51/2+1),y=math.ceil(h/2-19/2+1),width=51,height=19,
     dragger={
         x=3,y=2,width=46,height=1,
     }
