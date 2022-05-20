@@ -332,6 +332,7 @@ gui.create.button({
             on_click=function()
                 running = false
                 gui.term_object.setCursorPos(1,1)
+                gui.term_object.setBackgroundColor(colors.black)
                 gui.term_object.clear()
             end
         }
@@ -465,6 +466,7 @@ gui.create.button({
                     },
                     on_click=function()
                         gui.term_object.setCursorPos(1,1)
+                        gui.term_object.setBackgroundColor(colors.black)
                         gui.term_object.clear()
                         fs.delete(combine_path(path,"GuiH"))
                         running = false
