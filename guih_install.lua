@@ -54,10 +54,13 @@ local apis =    fs.list("GuiH/apis")
 local w,h = term.getSize()
 term.clear()
 
-local win = window.create(term.current(),1,1,w,h)
-term.redirect(win)
-
-local gui = GuiH.create_gui(term.current())
+local mGui = GuiH.create_gui(term.current())
+local gui = mGui.create.frame({
+    x=w/2-51/2+1,y=h/2-19/2+1,width=51,height=19,
+    dragger={
+        x=3,y=2,width=46,height=1,
+    }
+}).child
 gui.log=setmetatable({dump=function() end},{__call=function() end})
 
 local _next = gui.load_texture({[3]={[5]={b="8",t="8",s="",},[6]={b="7",t="8",s="",},[7]={b="8",t="8",s="",},},[4]={[5]={b="7",t="8",s="",},[6]={b="7",t="0",s="N",},[7]={b="8",t="7",s="",},},[5]={[5]={b="7",t="8",s="",},[6]={b="7",t="0",s="E",},[7]={b="8",t="7",s="",},},[6]={[5]={b="7",t="8",s="",},[6]={b="7",t="0",s="X",},[7]={b="8",t="7",s="",},},[7]={[5]={b="7",t="8",s="",},[6]={b="7",t="0",s="T",},[7]={b="8",t="7",s="",},},[8]={[5]={b="8",t="8",s="",},[6]={b="8",t="7",s="",},[7]={b="8",t="8",s="",},},offset={3,9,11,4,},})
@@ -468,7 +471,7 @@ gui.create.button({
                     end
                 }
                 local size_done = 0
-                gui.schedule(function()
+                mGui.schedule(function()
                     local p = combine_path(path,"GuiH")
                     if not fs.exists(path) then fs.makeDir(path)
                     else if fs.exists(p) then fs.delete(p) end end
@@ -496,7 +499,7 @@ gui.create.button({
 
 build_window(gui,"Gui-h installer")
 
-local err = gui.execute(function()
+local err = mGui.execute(function()
     while running do sleep() end
 end)
 
