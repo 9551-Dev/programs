@@ -486,7 +486,7 @@ gui.create.button({
                         file.write(v.data)
                         file.close()
                         fls.text = k
-                        sleep(v.size/50000)
+                        precise_sleep(v.size/50000)
                         size_done = size_done + v.size
                         pb.value = (size_done/file_size)*100
                     end
