@@ -67,6 +67,15 @@ local textures = {
     on = gui.load_texture({[3]={[5]={t="d",s=" ",b="d",},},[4]={[5]={t="f",s="|",b="0",},},offset={3,9,11,4,},}),
 }
 
+local function combine_path(...)
+    local strings = {...}
+    local path = ""
+    for k,v in ipairs(strings) do
+        path = fs.combine(path,v)
+    end
+    return path
+end
+
 local selectable = {
     objects=true,
     apis=true,
@@ -77,7 +86,7 @@ local function path_to_table(path,sol)
     if not sol then sol = {} end
     local list = fs.list(path)
     for k,v in pairs(list) do
-        local p = fs.combine(path,v)
+        local p = combine_path(path,v)
         if fs.isDir(p) then
             sol[v] = {}
             path_to_table(p,sol[v])
@@ -331,14 +340,14 @@ gui.create.button({
             if selectable[a] then
                 local v = buttons[a][b]
                 if v.ob.value then
-                    to_install[fs.combine(a,v.name,c,e)] = {
+                    to_install[combine_path(a,v.name,c,e)] = {
                         data=file,
                         size=size
                     }
                     file_size = file_size + size
                 end
             else
-                to_install[fs.combine(a,b,c,d,e)] = {
+                to_install[combine_path(a,b,c,d,e)] = {
                     data=file,
                     size=size
                 }
@@ -359,7 +368,7 @@ gui.create.button({
         gui.create.text{
             text=gui.text{
                 x=5,y=5,
-                text=("%q"):format(fs.combine(path,"GuiH")),
+                text=("%q"):format(combine_path(path,"GuiH")),
                 bg=colors.blue,
                 transparent=false
             },
@@ -454,15 +463,20 @@ gui.create.button({
                     on_click=function()
                         gui.term_object.setCursorPos(1,1)
                         gui.term_object.clear()
-                        fs.delete(fs.combine(path,"GuiH"))
+                        fs.delete(combine_path(path,"GuiH"))
                         running = false
                     end
                 }
                 local size_done = 0
                 gui.schedule(function()
-                    if not fs.exists(path) then fs.makeDir(path) end
+                    local p = combine_path(path,"GuiH")
+                    if not fs.exists(path) then fs.makeDir(path)
+                    else if fs.exists(p) then fs.delete(p) end end
+                    if not fs.exists(combine_path(p,"objects")) then fs.makeDir(combine_path(p,"objects")) end
+                    if not fs.exists(combine_path(p,"apis")) then fs.makeDir(combine_path(p,"apis")) end
+                    if not fs.exists(combine_path(p,"presets")) then fs.makeDir(combine_path(p,"presets")) end
                     for k,v in pairs(to_install) do
-                        local path = fs.combine(path,"GuiH",k)
+                        local path = combine_path(path,"GuiH",k)
                         local file = fs.open(path,"w")
                         file.write(v.data)
                         file.close()
