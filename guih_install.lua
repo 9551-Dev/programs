@@ -43,7 +43,7 @@ for k,v in pairs(ls) do
 end
 parallel.waitForAll(table.unpack(downloads))
 
-local GuiH = require "GuiH"
+local GuiH = require ".GuiH"
 local running = true
 local install_done = false
 
