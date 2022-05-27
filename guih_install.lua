@@ -493,7 +493,7 @@ gui.create.button({
                     sleep(0.5)
                     install_done=true
                     error("installing finished",0)
-                end)
+                end,nil,true)
             end
         }
     end
