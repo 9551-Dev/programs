@@ -1,10 +1,19 @@
 local function create_memory()
+    local proxy = {}
     local mem = setmetatable({},{
         __index=function(self,key)
-            if not rawget(self,key) then
-                rawset(self,key,0)
+            if not rawget(proxy,key) then
+                rawset(proxy,key,0)
                 return 0
+            else
+                return rawget(proxy,key)
             end
+        end,
+        __newindex=function(self,key,value)
+            if value > 255 then value = 0 end
+            if value < 0 then value = 255 end
+            rawset(proxy,key,value)
+            rawset(self,key,nil)
         end
     })
     return mem
@@ -24,9 +33,10 @@ local function interpret(program,interpret_speed)
     local active_loop = false
     local loops = 0
     local cursor = 0
-    local bf_ops = program:gsub("[^%>%<%+%-%.%,%[%]]","")
+    local bf_ops = program:gsub("[^%!%>%<%+%-%.%,%[%]]","")
     local i=1
     local pted = false
+    local ign_newline = false
     while i<=#bf_ops do
         local op = bf_ops:sub(i,i)
         local process_arg = true
@@ -48,14 +58,17 @@ local function interpret(program,interpret_speed)
             elseif op == "<" then
                 if memory[cursor-1] then cursor = cursor - 1 end
             elseif op == "." then
-                if memory[cursor] == 0x0A then print()
-                else term.write(string.char(math.max(0,math.min(255,memory[cursor])))) end
+                if (memory[cursor] == 0x0A) and (not ign_newline) then print()
+                else
+                    term.write(string.char(math.max(0,math.min(255,memory[cursor]))))
+                    if ign_newline and memory[cursor] == 0x0A then ign_newline = false end
+                end
                 pted = true
             elseif op == "," then
-                local inp = read()
-                if tonumber(inp) then inp = tonumber(inp)
-                else inp = (inp:sub(1,1) or ""):byte() end
-                if inp then memory[cursor] = inp end
+                local inp = select(2,os.pullEvent("char")):sub(1,1) or ""
+                term.write(inp)
+                local byte = inp:byte()
+                if byte then memory[cursor] = byte end
             elseif op == "[" then
                 if memory[cursor] == 0 then active_loop = true
                 else table.insert(stack,i) end
@@ -63,6 +76,8 @@ local function interpret(program,interpret_speed)
                 if memory[cursor] > 0 then i = stack[#stack]
                 else table.remove(stack,#stack)
                 end
+            elseif op == "!" then
+                ign_newline = true
             end
         end
         if not interpret_speed or interpret_speed < 0.00001 then
