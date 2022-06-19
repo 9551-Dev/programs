@@ -1,8 +1,12 @@
-local function create_memory(n)
-    local mem = {}
-    for i=0,n do
-        mem[i] = 0
-    end
+local function create_memory()
+    local mem = setmetatable({},{
+        __index=function(self,key)
+            if not rawget(self,key) then
+                rawset(self,key,0)
+                return 0
+            end
+        end
+    })
     return mem
 end
 
@@ -14,15 +18,15 @@ local function precise_sleep(t)
     end
 end
 
-local function interpret(program,memory,interpret_speed)
-    if memory and memory < 1 then memory = 1 end
-    local memory = create_memory(memory or 30000)
+local function interpret(program,interpret_speed)
+    local memory = create_memory()
     local stack = {}
     local active_loop = false
     local loops = 0
     local cursor = 0
     local bf_ops = program:gsub("[^%>%<%+%-%.%,%[%]]","")
     local i=1
+    local pted = false
     while i<=#bf_ops do
         local op = bf_ops:sub(i,i)
         local process_arg = true
@@ -46,6 +50,7 @@ local function interpret(program,memory,interpret_speed)
             elseif op == "." then
                 if memory[cursor] == 0x0A then print()
                 else term.write(string.char(math.max(0,math.min(255,memory[cursor])))) end
+                pted = true
             elseif op == "," then
                 local inp = read():sub(1,1):byte()
                 if inp then memory[cursor] = inp end
@@ -64,19 +69,55 @@ local function interpret(program,memory,interpret_speed)
         else precise_sleep(interpret_speed) end
         i = i + 1
     end
-    return memory
+    return memory,pted
 end
 
 local function main(...)
     local args = {...}
     local path = shell.resolve(args[1] or "")
-    if fs.exists(path) and path:match("%.bf$") then
-        local file = fs.open(path,"r")
-        local data = file.readAll()
-        file.close()
-        interpret(data,tonumber(args[3] or ""),tonumber(args[2] or ""))
+    if not args[1] or args[1] == "" then
+        local history = {}
+        local program = ""
+        term.setTextColor(colors.yellow)
+        print("Enter 'run' when you are finished with your program or 'exit' to exit.")
+        term.setTextColor(colors.white)
+        while true do
+            term.blit("> ","E0","FF")
+            local inp = read(nil,history)
+            table.insert(history,inp)
+            if inp == "run" then break
+            elseif inp == "exit" then return
+            else program = program .. inp end
+        end
+        local mem,pted = interpret(program,tonumber(args[2] or ""))
+        if pted then print() end
+    elseif args[1] == "-i" then
+        local program = args[2] or ""
+        local mem,pted = interpret(program,tonumber(args[3] or ""))
+        if pted then print() end
+    elseif args[1] == "-sh" then
+        local history = {}
+        term.setTextColor(colors.yellow)
+        print("Brainfuck prompt.")
+        print("Run 'exit' to exit.")
+        term.setTextColor(colors.white)
+        while true do
+            term.blit("BF> ","00E0","FFFF")
+            local inp = read(nil,history)
+            table.insert(history,inp)
+            if inp == "exit" then break end
+            local mem,pted = interpret(inp,tonumber(args[2] or ""))
+            if pted then print() end
+        end
     else
-        error("Path doesnt exist or doesnt have the .bf extension: "..path,0)
+        if fs.exists(path) and path:match("%.bf$") then
+            local file = fs.open(path,"r")
+            local data = file.readAll()
+            file.close()
+            interpret(data,tonumber(args[2] or ""))
+        else
+            error("Path doesnt exist or doesnt have the .bf extension: "..path,0)
+        end
     end
 end
 
