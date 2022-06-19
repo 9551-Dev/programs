@@ -145,6 +145,10 @@ local function main(...)
             term.blit("> ","E0","FF")
             local inp = read(nil,history)
             table.insert(history,inp)
+            inp = inp:gsub("rep%(.-,.-%)",function(data)
+                local cnt,str = data:match("rep%((.-),(.-)%)")
+                return string.rep(str,tonumber(cnt))
+            end)
             if inp == "run" then break
             elseif inp == "exit" then return
             else program = program .. inp end
