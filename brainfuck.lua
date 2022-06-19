@@ -50,9 +50,11 @@ local function interpret(program,interpret_speed)
             elseif op == "." then
                 if memory[cursor] == 0x0A then print()
                 else term.write(string.char(math.max(0,math.min(255,memory[cursor])))) end
-                pted = true
+                pted = true     
             elseif op == "," then
-                local inp = read():sub(1,1):byte()
+                local inp = read()
+                if tonumber(inp) then inp = tonumber(inp)
+                else inp = (inp:sub(1,1) or ""):byte() end
                 if inp then memory[cursor] = inp end
             elseif op == "[" then
                 if memory[cursor] == 0 then active_loop = true
