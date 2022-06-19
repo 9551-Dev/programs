@@ -27,13 +27,15 @@ local function precise_sleep(t)
     end
 end
 
+local argsSeparator = 255 -- Peripheral arguments separator
+
 local function interpret(program,interpret_speed)
     local memory = create_memory()
     local stack = {}
     local active_loop = false
     local loops = 0
     local cursor = 0
-    local bf_ops = program:gsub("[^%!%>%<%+%-%.%,%[%]]","")
+    local bf_ops = program:gsub("[^%!%>%<%+%-%.%,%[%]p]","")
     local i=1
     local pted = false
     local ign_newline = false
@@ -78,6 +80,47 @@ local function interpret(program,interpret_speed)
                 end
             elseif op == "!" then
                 ign_newline = true
+            elseif op == "p" then
+                local peripheralName = {}
+                while true do -- If we dont hit an end or a separator we read the memory
+                    if memory[cursor] == argsSeparator then break end
+                    if memory[cursor] == 0 then
+                        error("Hit 0 too early at "..cursor) -- Change this or use whatever you use to error
+                    end
+                    table.insert(peripheralName, string.char(memory[cursor])) -- Just assume everything we get a string
+                    -- This will probably backfire later.
+                    cursor = cursor + 1
+                end
+                peripheralName = table.concat(peripheralName, "")
+                local peripheralArgs = {}
+                local argCount = 0
+                local offset = 0
+                while true do -- Count all the arguments
+                    local currentCell = memory[cursor+offset]
+                    if currentCell == 0 then break end
+                    if currentCell == argsSeparator then argCount = argCount + 1 end
+                    if currentCell ~= argsSeparator then
+                        peripheralArgs[argCount] = peripheralArgs[argCount] or {}
+                        if bit32.band(currentCell, 0x60) == 0 then
+                            table.insert(peripheralArgs[argCount], currentCell-bit32.band(currentCell, 0x60))
+                        else
+                            table.insert(peripheralArgs[argCount], string.char(currentCell))
+                        end
+                    end
+                    offset = offset + 1
+                end
+                if argCount == 0 then
+                    error("No arguments for peripheral call")
+                end
+                for i=1, #peripheralArgs do
+                    local isNumber = false
+                    if tonumber(peripheralArgs[i]) then
+                        isNumber = true
+                    end
+                    peripheralArgs[i] = table.concat(peripheralArgs[i], "")
+                    if isNumber then peripheralArgs[i] = tonumber(peripheralArgs[i]) end
+                end
+                peripheral.call(peripheralName, table.unpack(peripheralArgs))
             end
         end
         if not interpret_speed or interpret_speed < 0.00001 then
