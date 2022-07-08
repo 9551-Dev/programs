@@ -1,7 +1,7 @@
-local input = peripheral.wrap("")
-local output = peripheral.wrap("")
-local output_other = peripheral.wrap("")
-local temp = peripheral.wrap("")
+local input = peripheral.wrap("minecraft:ironchest_obsidian_0")
+local output = peripheral.wrap("minecraft:ironchest_iron_5")
+local temp = peripheral.wrap("minecraft:ironchest_iron_0")
+local output_other = peripheral.wrap("minecraft:ironchest_iron_4")
 local grid = {1,2,5,6}
 
 for k,v in pairs(grid) do
@@ -17,10 +17,11 @@ while true do
     local items = {}
     local slots = {}
     for k,v in pairs(input.list()) do
-        if not items[v.name] then items[v.name] = 0 end
-        if not slots[v.name] then slots[v.name] = {} end
-        items[v.name] = items[v.name] + v.count
-        table.insert(slots[v.name],{slot=k,count=v.count})
+        local name = v.name .. v.damage
+        if not items[name] then items[name] = 0 end
+        if not slots[name] then slots[name] = {} end
+        items[name] = items[name] + v.count
+        table.insert(slots[name],{slot=k,count=v.count})
     end
     for k,v in pairs(items) do
         if v < 4 then items[k] = nil end
