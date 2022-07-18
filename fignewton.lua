@@ -51,11 +51,15 @@ local function wrap(str)
     return mGui.api.text.wrap(str,23)
 end
 
+local response = http.get("https://ideas.skystuff.games")
+local txt = response and response.readAll() or "click the FUCKING button 4head"
+if response then response.close() end
+
 local field = textfield.new.text{
     text=textfield.text{
         centered=true,
         transparent=true,
-        text=wrap("click the FUCKING button 4head"),
+        text=wrap(txt),
         offset_y=-0.5
     }
 }
