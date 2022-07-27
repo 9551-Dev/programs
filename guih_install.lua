@@ -17,16 +17,11 @@ local list = textutils.unserialiseJSON(github_api.readAll())
 local ls = {}
 local lsm = {}
 local files = {}
-local files_minified = {}
 local len = 0
 github_api.close()
 for k,v in pairs(list.tree) do
     if v.type == "blob" and v.path:lower():match(".+%.lua") then
         ls["https://raw.githubusercontent.com/9551-Dev/GuiH/main/"..v.path] = v.path
-        if v.path:lower():match(".+%.lua") then
-            lsm["https://raw.githubusercontent.com/9551-Dev/GuiH/minified/"..v.path] = v.path
-            len = len + 2
-        end
         len = len + 1
     end
 end
@@ -40,22 +35,6 @@ for k,v in pairs(ls) do
         local data = web.readAll()
         local file = fs.open(path,"w")
         files[v] = data
-        file.write(data)
-        file.close()
-        web.close()
-        finished = finished + 1
-        term.setCursorPos(x,y)
-        term.write(math.floor(percent*finished).."%")
-    end)
-end
-parallel.waitForAll(table.unpack(downloads))
-for k,v in pairs(lsm) do
-    table.insert(downloads,function()
-        local web = http.get(k)
-        local path = "GuiH_minified/"..v
-        local data = web.readAll()
-        local file = fs.open(path,"w")
-        files_minified[v] = data
         file.write(data)
         file.close()
         web.close()
@@ -166,9 +145,7 @@ local function format_size(size)
 end
 
 local files = path_to_table("GuiH")
-local files_minified = path_to_table("GuiH_minified")
 fs.delete("GuiH")
-fs.delete("GuiH_minified")
 
 local function build_window(gui,title)
     local fg_rect = gui.create.rectangle({
@@ -332,30 +309,6 @@ for k,v in pairs(presets) do
     buttons.presets[v] = {ob=sw,name=v}
 end
 
---* add a  button for selecting the minified  version
-local swm = gui.create.switch{
-    x=4,y=16,width=2,height=1,
-    tex_on=textures.on,
-    tex=textures.off,
-    graphic_order=12
-}
-
---* add a text and color script for this switch
-local minitext = gui.new.text{
-    text=gui.text{
-        x=7,y=16,
-        text="GuiH minified",
-        transparent=true
-    }
-}
-
-gui.create.script{
-    code=function()
-        minitext.text.fg = swm.value and colors.lime or colors.red
-    end,
-    logic_order=2
-}
-
 gui.create.button({
     x=40,y=15,width=6,height=3,
     tex=_next,
@@ -387,7 +340,7 @@ gui.create.button({
         }
         local to_install = {}
         local file_size = 0
-        iterate_reccursively((not swm.value) and files or files_minified,function(file,a,b,c,d,e)
+        iterate_reccursively(files,function(file,a,b,c,d,e)
             a,b,c,d,e = a or "",b or "",c or "",d or "",e or ""
             local size = #("%q"):format(file)
             if selectable[a] then
