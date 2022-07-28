@@ -30,7 +30,7 @@ local percent = 100 / len
 local finished = 0
 for k,v in pairs(ls) do
     table.insert(downloads,function()
-        local web = http.get(k)
+        local web = assert(http.get(k),"Failed to download "..k)
         local path = "GuiH/"..v
         local data = web.readAll()
         local file = fs.open(path,"w")
