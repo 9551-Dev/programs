@@ -505,7 +505,7 @@ gui.create.button({
 build_window(gui,"Gui-h installer")
 
 local err = mGui.execute(function()
-    while running do sleep() end
+    while running do sleep(0.1) end
 end)
 
 if box.input ~= "" or not install_done then fs.delete("GuiH") fs.delete("GuiH_minified") end
