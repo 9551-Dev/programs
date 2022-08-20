@@ -3,14 +3,18 @@
 local terminal = term.current()
 local w,h = terminal.getSize()
 local ws,hs = w/212,h/75
-local bs = math.max((w*h)/(212*75),0.5)
+local bs = math.max((w*h)/(212*75),0.7)
 
 --fireworks
 local firework_particles = {100,200}
 local colors_range = {2,5}
 local multicolor_firework_chance = 5
 
-local rocket_autospawn = true
+local fancy_fireworks = true
+local fancy_firework_particles = {100,500}
+local fancy_firework_chance = 20
+local multicolor_fancy_firework_chance = 2
+
 local max_fireworks = 2
 local firework_chance = 10*bs
 
@@ -60,7 +64,7 @@ local acceleration_range = {200*(bs*2),500*(bs*2)}
 local deceleration_range = {5*(bs*2),10*(bs*2)}
 local gravity_range = {8,30}
 
-local particle_life_range = {10*bs,40*bs}
+local particle_life_range = {5*bs,20*bs}
 local round_expanding = true
 ------------------------------------------------------
 
@@ -157,26 +161,36 @@ local function update_fireworks()
         if (v.duration >= v.life and math.random(1,explode_chance) == 1) or v.pos.y <= max_height then
             local rocket = table.remove(fireworks,k)
             if rocket then
-                local c = get_rand_color()
+                local c  = get_rand_color()
+                local c2 = get_rand_color()
                 local cSingle = firework_colors[math.random(1,#firework_colors)]
+                local c2Single = firework_colors[math.random(1,#firework_colors)]
                 local multicolor = math.random(1,multicolor_firework_chance) == 1
                 local range = firework_ranges[math.random(1,#firework_ranges)]
                 local size =  firework_sizes [math.random(1,#firework_sizes) ]
                 for i=1,math.random(firework_particles[1],firework_particles[2]) do
                     if multicolor then
-                        particle(rocket.pos.x,rocket.pos.y,c[math.random(1,#c)],math.random(1,2),1)
+                        particle(rocket.pos.x,rocket.pos.y,c[math.random(1,#c)],range,size)
                     else
                         particle(rocket.pos.x,rocket.pos.y,cSingle,range,size)
+                    end
+                end
+                if fancy_fireworks and math.random(1,fancy_firework_chance) == 1  then
+                    local multicolor = math.random(1,multicolor_fancy_firework_chance) == 1
+                    for i=1,math.random(fancy_firework_particles[1],fancy_firework_particles[2]) do
+                        if not multicolor then
+                            particle(rocket.pos.x,rocket.pos.y,c2Single,range,size*2)
+                        else
+                            particle(rocket.pos.x,rocket.pos.y,c2[math.random(1,#c2)],range,size*2)
+                        end
                     end
                 end
             end
         end
     end
-    if rocket_autospawn then
-        for i=1,max_fireworks-#fireworks do
-            if #fireworks < max_fireworks and math.random(1,firework_chance) == 1 then
-                firework(math.random(1,w),h)
-            end
+    for i=1,max_fireworks-#fireworks do
+        if #fireworks < max_fireworks and math.random(1,firework_chance) == 1 then
+            firework(math.random(1,w),h)
         end
     end
 end
@@ -190,7 +204,6 @@ local function draw_fireworks()
 end
 
 local function update_particles()
-    local dead = {}
     for k,v in pairs(particles) do
         v.pos.y = v.pos.y + v.gravity
         v.duration = v.duration + 1
@@ -211,21 +224,27 @@ local function update_particles()
 
         if v.duration > v.life or is_offscreen(v.pos.x,v.pos.y) then
             v.duration = v.duration - 1
-            dead[#dead+1] = k
+            table.remove(particles,k)
         end
-    end
-    for k,v in pairs(dead) do
-        table.remove(particles,k)
     end
 end
 
 local function draw_particles()
+    local buffer = {}
     for k,v in pairs(particles) do
-        win.setCursorPos(v.pos.x,v.pos.y)
-        win.setTextColor(v.color)
         local char_index = math.ceil((math.min(v.duration/v.life,1))*#particle_sizes)
-        if not particle_sizes[char_index] then error(v.duration/v.life.."e"..#particle_sizes) end
-        win.write(particle_sizes[char_index])
+        if not buffer[v.pos.y] then buffer[v.pos.y] = {} end
+        if not buffer[v.pos.y][v.pos.x] then buffer[v.pos.y][v.pos.x] = {char=char_index,obj=v}
+        elseif buffer[v.pos.y][v.pos.x].char > char_index then
+            buffer[v.pos.y][v.pos.x] = {char=char_index,obj=v}
+        end
+    end
+    for y,x_list in pairs(buffer) do
+        for x,v in pairs(x_list) do
+            win.setCursorPos(x,y)
+            win.setTextColor(v.obj.color)
+            win.write(particle_sizes[v.char])
+        end
     end
 end
 
