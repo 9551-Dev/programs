@@ -10,6 +10,7 @@ local firework_particles = {100,200}
 local colors_range = {2,5}
 local multicolor_firework_chance = 5
 
+local rocket_autospawn = true
 local max_fireworks = 2
 local firework_chance = 10*bs
 
@@ -171,9 +172,11 @@ local function update_fireworks()
             end
         end
     end
-    for i=1,max_fireworks-#fireworks do
-        if #fireworks < max_fireworks and math.random(1,firework_chance) == 1 then
-            firework(math.random(1,w),h)
+    if rocket_autospawn then
+        for i=1,max_fireworks-#fireworks do
+            if #fireworks < max_fireworks and math.random(1,firework_chance) == 1 then
+                firework(math.random(1,w),h)
+            end
         end
     end
 end
