@@ -54,7 +54,7 @@ local star_colors = {
 ------------------------------------------------------
 
 --particles
-local particle_sizes = {"#","X","O","+","-","*",":",",","."}
+local particle_sizes = {"#","X","O","\4","+","*","-",":",",","."}
 
 local acceleration_range = {200*(bs*2),500*(bs*2)}
 local deceleration_range = {5*(bs*2),10*(bs*2)}
