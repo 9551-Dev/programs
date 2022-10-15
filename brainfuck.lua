@@ -174,13 +174,13 @@ local function main(...)
             if pted then print() end
         end
     else
-        if fs.exists(path) and path:match("%.bf$") then
+        if fs.exists(path) and ( path:match("%.bf$") or path:match("%.b$") ) then
             local file = fs.open(path,"r")
             local data = file.readAll()
             file.close()
             interpret(data,tonumber(args[2] or ""))
         else
-            error("Path doesnt exist or doesnt have the .bf extension: "..path,0)
+            error("Path doesnt exist or doesnt have the .bf or .b extension: "..path,0)
         end
     end
 end
